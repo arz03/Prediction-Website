@@ -1,6 +1,6 @@
 {
     "rewrites":[{
-        "soure": "/(.*)",
+        "source": "/(.*)",
         "destination": "/api/index"
     }],
     "regions": ["sin1"]
