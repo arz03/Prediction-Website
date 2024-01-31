@@ -1,7 +1,6 @@
 # app.py
 from flask import Flask, render_template, request, redirect, url_for
 import tempfile
-import os
 
 app = Flask(__name__)
 
@@ -11,9 +10,10 @@ password_for_answer = "jaiyashbala"
 # Set the upcoming event (e.g., what the streamer will wear)
 upcoming_event = "Guess the outfit"
 
-# Create temporary files for predictions and leaderboard
+# Global variables for predictions, leaderboard, and correct answer
 predictions_file = tempfile.NamedTemporaryFile(delete=False, mode='a+')
 leaderboard_file = tempfile.NamedTemporaryFile(delete=False, mode='w+')
+correct_answer = ""
 
 @app.route('/')
 def home():
