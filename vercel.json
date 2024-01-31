@@ -1,0 +1,14 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "/app/Dockerfile",
+        "use": "@vercel/static-build"
+      }
+    ],
+    "routes": [
+      { "handle": "filesystem" },
+      { "src": "/.*", "dest": "/app/main:app" }
+    ]
+  }
+  
