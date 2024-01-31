@@ -14,8 +14,8 @@ predictions = []
 points = {}
 correct_answer = ""
 leaderboard = []
-predictions_file_path = "predictions.txt"
-leaderboard_file_path = "leaderboard.txt"
+predictions_file_path = "api/predictions.txt"
+leaderboard_file_path = "api/leaderboard.txt"
 
 @app.route('/')
 def home():
