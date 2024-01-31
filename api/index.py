@@ -1,5 +1,7 @@
 # app.py
 from flask import Flask, render_template, request, redirect, url_for
+import tempfile
+import os
 
 app = Flask(__name__)
 
@@ -9,13 +11,9 @@ password_for_answer = "jaiyashbala"
 # Set the upcoming event (e.g., what the streamer will wear)
 upcoming_event = "Guess the outfit"
 
-# Simple list to store predictions and points
-predictions = []
-points = {}
-correct_answer = ""
-leaderboard = []
-predictions_file_path = "api/predictions.txt"
-leaderboard_file_path = "api/leaderboard.txt"
+# Create temporary files for predictions and leaderboard
+predictions_file = tempfile.NamedTemporaryFile(delete=False, mode='a+')
+leaderboard_file = tempfile.NamedTemporaryFile(delete=False, mode='w+')
 
 @app.route('/')
 def home():
@@ -27,9 +25,9 @@ def submit_prediction():
     username = request.form.get('username')
     user_prediction = request.form.get('prediction')
 
-    # Store user predictions in a file for later reference
-    with open(predictions_file_path, "a") as file:
-        file.write(f"{username}, {user_prediction}\n")
+    # Store user predictions in the temporary file for later reference
+    predictions_file.write(f"{username}, {user_prediction}\n")
+    predictions_file.seek(0)
 
     return render_template('index.html', upcoming_event=upcoming_event)
 
@@ -58,20 +56,23 @@ def reveal_answer():
     global correct_answer
     global leaderboard
 
-    # Read predictions from file and update leaderboard
-    with open(predictions_file_path, "r") as file:
-        for line in file:
-            username, user_prediction = line.strip().split(", ")
-            if user_prediction == correct_answer:
-                points[username] = points.get(username, 0) + 1
+    # Read predictions from the temporary file and update leaderboard
+    predictions = [line.strip().split(", ") for line in predictions_file]
 
-    # Update leaderboard file
-    with open(leaderboard_file_path, "w") as file:
-        for username, score in sorted(points.items(), key=lambda x: x[1], reverse=True):
-            file.write(f"{username}, {score}\n")
+    # Calculate leaderboard
+    points = {}
+    for username, user_prediction in predictions:
+        if user_prediction == correct_answer:
+            points[username] = points.get(username, 0) + 1
 
-    # Update leaderboard variable
-    leaderboard = sorted(points.items(), key=lambda x: x[1], reverse=True)
+    # Update leaderboard in the temporary file
+    leaderboard_file.seek(0)
+    leaderboard_file.truncate()
+    for username, score in sorted(points.items(), key=lambda x: x[1], reverse=True):
+        leaderboard_file.write(f"{username}, {score}\n")
+    
+    leaderboard_file.seek(0)
+    leaderboard = [line.strip().split(", ") for line in leaderboard_file]
 
     return render_template('revealed_answer.html', predictions=predictions, upcoming_event=upcoming_event, revealed_answer=correct_answer, correct_answer_set=True, password_verified=True, leaderboard=leaderboard)
 
