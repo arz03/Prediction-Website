@@ -1,0 +1,22 @@
+<!-- templates/submit_answer.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Answer</title>
+</head>
+<body>
+    <h1>Submit Correct Answer</h1>
+    <form action="/submit_answer" method="post">
+        <label for="correct_answer">Set Correct Answer:</label>
+        <input type="text" id="correct_answer" name="correct_answer" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">Submit Correct Answer</button>
+        <h2>This will automatically reveal answer.</h2>
+    </form>
+    
+    <hr>
+</body>
+</html>

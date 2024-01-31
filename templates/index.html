@@ -1,0 +1,34 @@
+<!-- templates/index.html -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Game</title>
+</head>
+
+<body>
+    <h1>Welcome to the Prediction Game</h1>
+    <p>Make your predictions below for what jaizus will wear in the upcoming stream:</p>
+    
+    <form action="/submit_prediction" method="post">
+        <label for="username">Your Name:</label>
+        <input type="text" id="username" name="username" required>
+        <label for="prediction">Your Prediction:</label>
+        <input type="text" id="prediction" name="prediction" required>
+        <button type="submit">Submit Prediction</button>
+    </form>
+    <br>
+    <br>
+    <hr>
+    <h3>Upcoming Event</h3>
+    <p><span id="upcoming_event">{{ upcoming_event }}</span></p>
+    
+    <h2>Leaderboard will be displayed here after stream begins:</h2>
+    <a href="/reveal_answer" id="reveal_answer_link">-> Results </a>
+
+</body>
+
+</html>

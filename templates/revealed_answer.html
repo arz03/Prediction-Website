@@ -1,0 +1,29 @@
+<!-- templates/revealed_answer.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revealed Answer</title>
+</head>
+<body>
+    <h1>Leaderboard</h1>
+    
+    {% if revealed_answer %}
+        <h3>Correct Answer (Revealed)</h3>
+        <p>The live streamer wore: <span id="revealed_answer">{{ revealed_answer }}</span></p>
+        
+        {% if leaderboard %}
+            <h2>Leaderboard</h2>
+            <ol>
+                {% for entry in leaderboard %}
+                    <!-- <li>{{ entry[0] }}: {{ entry[1] }} points</li> -->
+                    <li>{{ entry[0] }}</li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+    {% else %}
+        <p>No answer revealed yet.</p>
+    {% endif %}
+</body>
+</html>
