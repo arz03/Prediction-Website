@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
 
 # Hardcoded password for setting the correct answer (replace with a secure method in production)
-password_for_answer = "pass"
+password_for_answer = "jaiyashbala"
 
 # Set the upcoming event (e.g., what the streamer will wear)
 upcoming_event = "Guess the outfit"
