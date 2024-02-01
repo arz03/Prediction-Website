@@ -1,29 +1,118 @@
 <!-- templates/revealed_answer.html -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Revealed Answer</title>
-</head>
-<body>
-    <h1>Leaderboard</h1>
-    
-    {% if revealed_answer %}
-        <h3>Correct Answer (Revealed)</h3>
-        <p>The live streamer wore: <span id="revealed_answer">{{ revealed_answer }}</span></p>
+
+    <!-- Include Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <style>
+        body {
+            background: repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(110, 6, 228, 0.5) 20px, rgba(128, 0, 128, 0.5) 40px), url('https://cdn.discordapp.com/attachments/868562369503182928/1202729476744679454/bhosdiwala_-_Made_with_Clipchamp.gif?ex=65ce841c&is=65bc0f1c&hm=b681d2f2df17530b38fca1fdd7ab02774b1bf96cd813cac85bfedb248383aebd&') fixed center;
+            background-size: cover;
+            background-color: #673ab7; /* Purple Background */
+            color: white;
+        }
+
+        .nav-wrapper {
+            background-color: #4527a0; /* Darker shade for the nav container */
         
-        {% if leaderboard %}
-            <h2>Leaderboard</h2>
-            <ol>
-                {% for entry in leaderboard %}
-                    <!-- <li>{{ entry[0] }}: {{ entry[1] }} points</li> -->
-                    <li>{{ entry[0] }}</li>
-                {% endfor %}
-            </ol>
+        }
+
+        .nav-wrapper a.brand-logo {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 64px; /* Adjust the line-height as needed for the vertical height */
+            font-size: 3rem;
+        }
+
+        .result-container {
+            padding: 7px;
+            max-width: 80%;
+            border-radius: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .leaderboard-container {
+            max-width: 80%;
+            margin: 100px auto;
+            background-color: #4527a0ee; /* Darker shade for the container */
+            padding: 20px;
+            border-radius: 30px;
+            text-align: center;
+        }
+
+        .leaderboard-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .leaderboard-name,
+        .leaderboard-score,
+        .leaderboard-prediction {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .leaderboard-score {
+            flex: 0 0 100px;
+            text-align: right;
+        }
+
+        hr {
+            border-top: 1px solid #9c27b0; /* Border color for lines */
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="purple darken-4">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo center">Results</a>
+        </div>
+    </nav>
+
+
+    <div class="container leaderboard-container">
+        {% if revealed_answer %}
+            <h5 align="left">Correct Answer (Revealed)</h5>
+            <p align="left">The live streamer wore: <span id="revealed_answer">{{ revealed_answer }}</span></p>
+        {% else %}
+            <p >Answers will be revealed once jaiyaxh is live.</p>
         {% endif %}
-    {% else %}
-        <p>No answer revealed yet.</p>
-    {% endif %}
+        {% if leaderboard %}
+            <hr>
+            <h2>Leaderboard</h2>
+            <div class="leaderboard-row">
+                <div class="leaderboard-name">Username</div>
+                <div class="leaderboard-score">Score</div>
+                <div class="leaderboard-prediction">Prediction</div>
+            </div>
+            <hr>
+            {% for entry in leaderboard %}
+                <div class="leaderboard-row">
+                    <div class="leaderboard-name">{{ entry[0] }}</div>
+                    <div class="leaderboard-score">{{ entry[1] }} points</div>
+                    <div class="leaderboard-prediction">{{ user_predictions[entry[0]] }}</div>
+                </div>
+                <hr>
+            {% endfor %}
+        {% else %}  
+            <p>No leaderboard available yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Include Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
+
 </html>

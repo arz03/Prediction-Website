@@ -1,34 +1,113 @@
 <!-- templates/index.html -->
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prediction Game</title>
+
+    <!-- Include Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <style>
+        body {
+            background: url('https://cdn.discordapp.com/attachments/868562369503182928/1202729476744679454/bhosdiwala_-_Made_with_Clipchamp.gif?ex=65ce841c&is=65bc0f1c&hm=b681d2f2df17530b38fca1fdd7ab02774b1bf96cd813cac85bfedb248383aebd&') fixed center;
+            background-size: cover;
+            color: white;
+        }
+
+        .translucent-background {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            color: #282a2c; /* Text color on translucent background */
+        }
+
+        /* Add this style to adjust the form layout */
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Add this style to adjust the form input fields */
+        .input-field {
+            margin-bottom: 20px;
+        }
+        
+        /* Add this style to adjust the form input labels */
+        .input-field label {
+            color: #1a1a1a; /* Slightly darker text color */
+        }
+
+        /* Add this style to adjust the form button */
+        button {
+            width: 50%; /* Adjust the width as needed */
+            align-self: center;
+        }
+
+        /* Add this style to adjust the navigation bar */
+        .nav-wrapper a.brand-logo {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 64px; /* Adjust the line-height as needed for the vertical height */
+        }
+
+        /* Adjust the font size or other styles as needed */
+        .nav-wrapper a.brand-logo {
+            font-size: 1.5rem;
+            /* Add other styles if necessary */
+        }
+
+        hr {
+            border-top: 1px solid #9c27b0; /* Border color for lines */
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Welcome to the Prediction Game</h1>
-    <p>Make your predictions below for what jaizus will wear in the upcoming stream:</p>
-    
-    <form action="/submit_prediction" method="post">
-        <label for="username">Your Name:</label>
-        <input type="text" id="username" name="username" required>
-        <label for="prediction">Your Prediction:</label>
-        <input type="text" id="prediction" name="prediction" required>
-        <button type="submit">Submit Prediction</button>
-    </form>
-    <br>
-    <br>
-    <hr>
-    <h3>Upcoming Event</h3>
-    <p><span id="upcoming_event">{{ upcoming_event }}</span></p>
-    
-    <h2>Leaderboard will be displayed here after stream begins:</h2>
-    <a href="/reveal_answer" id="reveal_answer_link">-> Results </a>
+    <nav class="purple darken-4">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo center">Welcome to the Prediction Game</a>
+        </div>
+    </nav>
 
+    <div class="container translucent-background">
+        <h5>Make your predictions below for what jaiyzus will wear in the upcoming stream:</h5>
+
+        <form action="/submit_prediction" method="post">
+            <div class="input-field">
+                <input type="text" id="username" name="username" required>
+                <label for="username">Your Name</label>
+            </div>
+
+            <div class="input-field">
+                <input type="text" id="prediction" name="prediction" required>
+                <label for="prediction">Your Prediction (eg. pink hoodie, bear jacket, blue sweatshirt)</label>
+            </div>
+
+            <button class="btn waves-effect waves-light purple darken-4" type="submit">Submit Prediction</button>
+        </form>
+
+        <hr>
+
+        <!-- Display leaderboard here 
+        <ul class="collection with-header">
+            <li class="collection-header"><h4>Leaderboard</h4></li>
+            {% for user, score in leaderboard %}
+                <li class="collection-item">{{ user }}: {{ score }} points</li>
+            {% endfor %}
+        </ul>   -->
+
+        <h5>Upcoming Event</h5>
+        <p>Status: <span id="upcoming_event">{{ upcoming_event }}</span></p>
+        <a href="/reveal_answer" class="waves-effect waves-light btn purple darken-4">Results</a>
+    </div>
+
+    <!-- Include Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 
 </html>

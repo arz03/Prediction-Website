@@ -5,18 +5,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Answer</title>
+
+    <!-- Include Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 </head>
+
 <body>
-    <h1>Submit Correct Answer</h1>
-    <form action="/submit_answer" method="post">
-        <label for="correct_answer">Set Correct Answer:</label>
-        <input type="text" id="correct_answer" name="correct_answer" required>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <button type="submit">Submit Correct Answer</button>
-        <h2>This will automatically reveal answer.</h2>
-    </form>
+    <nav class="purple darken-4">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo center">Submit Correct Answer</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h5>Submit Correct Answer</h5>
+        <form action="/submit_answer" method="post">
+            <div class="input-field">
+                <input type="text" id="correct_answer" name="correct_answer" required>
+                <label for="correct_answer">Set Correct Answer</label>
+            </div>
+
+            <div class="input-field">
+                <input type="password" id="password" name="password" required>
+                <label for="password">Password</label>
+            </div>
+
+            <button class="btn waves-effect waves-light purple darken-4" type="submit">Submit Correct Answer</button>
+        </form>
+
+        <hr>
+    </div>
+    <h2>This will automatically reveal answer.</h2>
     
-    <hr>
+    <!-- Include Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
+
 </html>
