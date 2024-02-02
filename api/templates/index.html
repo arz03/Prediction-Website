@@ -1,6 +1,6 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +33,7 @@
         .input-field {
             margin-bottom: 20px;
         }
-        
+
         /* Add this style to adjust the form input labels */
         .input-field label {
             color: #1a1a1a; /* Slightly darker text color */
@@ -51,12 +51,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             line-height: 64px; /* Adjust the line-height as needed for the vertical height */
-        }
-
-        /* Adjust the font size or other styles as needed */
-        .nav-wrapper a.brand-logo {
-            font-size: 1.5rem;
-            /* Add other styles if necessary */
+            font-size: 1.5rem; /* Adjust the font size as needed */
         }
 
         hr {
@@ -84,8 +79,18 @@
             </div>
 
             <div class="input-field">
-                <input type="text" id="prediction" name="prediction" required>
-                <label for="prediction">Your Prediction (eg. pink hoodie, bear jacket, blue sweatshirt)</label>
+                <select id="prediction" name="prediction" required>
+                    <option value="" disabled selected>Select your prediction</option>
+                    <option value="pink hoodie">Pink Hoodie</option>
+                    <option value="bear jacket">Bear Jacket</option>
+                    <option value="blue sweatshirt">Blue Sweatshirt</option>
+                    <option value="White tshirt">White Tshirt</option>
+                    <option value="other tshirt">Other Tshirt</option>
+                    <option value="other">Other</option>
+                    <option value="nangu">Nangu</option>
+                    <!-- Add more options as needed -->
+                </select>
+                <label for="prediction">Your Prediction</label>
             </div>
 
             <button class="btn waves-effect waves-light purple darken-4" type="submit">Submit Prediction</button>
@@ -93,7 +98,7 @@
 
         <hr>
 
-        <!-- Display leaderboard here 
+        <!-- Display another leaderboard here 
         <ul class="collection with-header">
             <li class="collection-header"><h4>Leaderboard</h4></li>
             {% for user, score in leaderboard %}
@@ -108,6 +113,14 @@
 
     <!-- Include Materialize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <!-- Initialize Materialize components -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('select');
+            var instances = M.FormSelect.init(elems);
+        });
+    </script>
 </body>
 
 </html>
