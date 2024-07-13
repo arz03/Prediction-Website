@@ -10,7 +10,7 @@ app = Flask(__name__)
 password_for_answer = "arjun"
 
 # Set the upcoming event (e.g., what the streamer will wear)
-upcoming_event = "Guess the outfit"
+upcoming_event = "Guess the time when jaiyash will start the stream."
 
 # Simple list to store predictions and points
 predictions = []
