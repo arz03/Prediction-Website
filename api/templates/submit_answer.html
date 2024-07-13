@@ -20,19 +20,9 @@
         <h5>Submit Correct Answer</h5>
         <form action="/submit_answer" method="post">
             <div class="input-field">
-                <!-- Change the ID, name, and values as needed -->
-                <select id="correct_answer" name="correct_answer" required>
-                    <option value="" disabled selected>Select correct answer</option>
-                    <option value="pink hoodie">Pink Hoodie</option>
-                    <option value="bear jacket">Bear Jacket</option>
-                    <option value="blue sweatshirt">Blue Sweatshirt</option>
-                    <option value="White tshirt">White Tshirt</option>
-                    <option value="other tshirt">Other Tshirt</option>
-                    <option value="other">Other</option>
-                    <option value="nangu">Nangu</option>
-                    <!-- Add more options as needed -->
-                </select>
-                <label for="correct_answer">Set Correct Answer</label>
+                <!-- Replaced dropdown with time input for 24-hour format -->
+                <input type="time" id="correct_answer" name="correct_answer" required>
+                <label for="correct_answer">Set Correct Answer Time</label>
             </div>
 
             <div class="input-field">
