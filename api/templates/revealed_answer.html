@@ -95,15 +95,15 @@
             <h2>Leaderboard</h2>
             <div class="leaderboard-row">
                 <div class="leaderboard-name">Username</div>
-                <div class="leaderboard-score">Score</div>
+                <div class="leaderboard-score">Accuracy</div>
                 <div class="leaderboard-prediction">Prediction</div>
             </div>
             <hr>
             {% for entry in leaderboard %}
                 <div class="leaderboard-row">
                     <div class="leaderboard-name">{{ entry[0] }}</div>
-                    <div class="leaderboard-score">{{ entry[1] }} points</div>
-                    <div class="leaderboard-prediction">{{ user_predictions[entry[0]] }}</div>
+                    <div class="leaderboard-score">{{ entry[1] }} minutes</div>
+                    <div class="leaderboard-prediction">{{ user_predictions[entry[0]].strftime('%H:%M') }}</div>
                 </div>
                 <hr>
             {% endfor %}

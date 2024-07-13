@@ -2,6 +2,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 import tempfile
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -32,10 +33,12 @@ def submit_prediction():
     global predictions
     username = request.form.get('username')
     user_prediction = request.form.get('prediction')
+    user_prediction = datetime.strptime(user_prediction, "%H:%M").strftime("%H:%M")
 
     # Store user predictions in a file for later reference
     with open(predictions_file_path, "a") as file:
         file.write(f"{username}, {user_prediction}\n")
+        print(f"{username}, {user_prediction}\n")
 
     return render_template('index.html', upcoming_event=f"{username}, your prediction has been submitted. Results will be revealed once jaiyash starts the sream. Thank you!")
 
@@ -54,17 +57,25 @@ def submit_answer():
         entered_password = request.form.get('password')
 
         if entered_password == password_for_answer:
-            correct_answer = request.form.get('correct_answer').lower()  # Convert to lowercase for case-insensitive matching
+            correct_answer = request.form.get('correct_answer') # Convert to lowercase for case-insensitive matching
+            # Parse the correct_answer into a datetime object
+            # Assuming the date is not important, using a placeholder date
+            correct_time = datetime.strptime(correct_answer, "%H:%M")
 
             # Read predictions from file and update leaderboard
             user_predictions = {}
             with open(predictions_file_path, "r") as file:
                 for line in file:
                     username, user_prediction = line.strip().split(", ")
-                    user_predictions[username] = user_prediction
+                    user_prediction_time= datetime.strptime(user_prediction, "%H:%M")
+                    user_predictions[username] = user_prediction_time
 
-                    if user_prediction.lower() in correct_answer:
-                        points[username] = points.get(username, 0) + 1
+                    time_difference_seconds = abs((user_prediction_time - correct_time).total_seconds())
+                    time_difference = time_difference_seconds / 60
+                    points[username] = time_difference
+
+                    #if user_prediction.lower() in correct_answer:
+                    #    points[username] = time_difference
 
             # Update leaderboard file
             with open(leaderboard_file_path, "w") as file:
@@ -72,8 +83,8 @@ def submit_answer():
                     file.write(f"{username}, {score}, {user_predictions.get(username, 'N/A')}\n")
 
             # Update leaderboard variable
-            leaderboard = sorted(points.items(), key=lambda x: x[1], reverse=True)
-            print(f"leaderboard {leaderboard}")
+            leaderboard = sorted(points.items(), key=lambda x: x[1], reverse=False)
+            print(f"leaderboard list: {leaderboard}")
 
             return render_template('submit_answer.html', upcoming_event=upcoming_event, correct_answer_submitted=True, correct_answer_set=True, password_verified=True)
 
