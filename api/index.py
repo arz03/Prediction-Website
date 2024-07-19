@@ -70,7 +70,7 @@ def submit_prediction():
     return render_template('index.html', upcoming_event=f"{username}, your prediction has been submitted. Results will be revealed once jaiyash starts the stream. Thank you!")
 
 def get_live_start_time(api_key, channel_id):
-    print("YT api : Checking if jaiyash is live...")
+    print("YT API: Checking if jaiyash is live...")
     url = "https://www.googleapis.com/youtube/v3/search"
     params = {
         "part": "snippet",
@@ -211,7 +211,8 @@ def check_and_calculate_points():
     """
     global stream_start_time
     while True:
-        if get_live_start_time(api_key, channel_id):
+        live_start_time = get_live_start_time(api_key, channel_id)
+        if live_start_time:
             if not stream_start_time:
                 stream_start_time = datetime.now(pytz.timezone('Asia/Kolkata'))
                 calculate_points()
@@ -228,7 +229,8 @@ def check_and_calculate_points():
                     print("State has been automatically reset.")
                     print("State has been automatically reset.")
                     print("State has been automatically reset.")
-        print("Not live yet, checking again in 60 seconds...")
+        else:
+            print("Not live yet, checking again in 60 seconds...")
         time.sleep(60)  # Check every 60 seconds
 
 if __name__ == '__main__':
