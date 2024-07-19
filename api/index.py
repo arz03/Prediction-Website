@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 import tempfile
 import time
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 from threading import Thread
 import requests
 import os
@@ -206,11 +206,19 @@ def check_and_calculate_points():
                 stream_start_time = datetime.now(pytz.timezone('Asia/Kolkata'))
                 calculate_points()
                 reset_time = stream_start_time + timedelta(hours=10)
+                print(f"Stream has started at {stream_start_time}. Resetting state at {reset_time}.")
+                print(f"Stream has started at {stream_start_time}. Resetting state at {reset_time}.")
+                print(f"Stream has started at {stream_start_time}. Resetting state at {reset_time}.")
+                print(f"Stream has started at {stream_start_time}. Resetting state at {reset_time}.")
                 while datetime.now(pytz.timezone('Asia/Kolkata')) < reset_time:
                     time.sleep(60)  # Sleep in intervals of 60 seconds
                 with app.app_context():
                     reset()
                     print("State has been automatically reset.")
+                    print("State has been automatically reset.")
+                    print("State has been automatically reset.")
+                    print("State has been automatically reset.")
+        print("Not live yet, checking again in 60 seconds...")
         time.sleep(60)  # Check every 60 seconds
 
 if __name__ == '__main__':
