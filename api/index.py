@@ -70,6 +70,7 @@ def submit_prediction():
     return render_template('index.html', upcoming_event=f"{username}, your prediction has been submitted. Results will be revealed once jaiyash starts the stream. Thank you!")
 
 def get_live_start_time(api_key, channel_id):
+    print("YT api : Checking if jaiyash is live...")
     url = "https://www.googleapis.com/youtube/v3/search"
     params = {
         "part": "snippet",
@@ -79,32 +80,39 @@ def get_live_start_time(api_key, channel_id):
         "key": api_key
     }
     
-    response = requests.get(url, params=params)
-    data = response.json()
-    
-    if not data["items"]:
-        return None  # Not live
-    
-    video_id = data["items"][0]["id"]["videoId"]
-    
-    url = f"https://www.googleapis.com/youtube/v3/videos"
-    params = {
-        "part": "liveStreamingDetails",
-        "id": video_id,
-        "key": api_key
-    }
-    
-    response = requests.get(url, params=params)
-    data = response.json()
-    
-    live_start_time = data["items"][0]["liveStreamingDetails"]["actualStartTime"]
-    live_start_time = datetime.fromisoformat(live_start_time.replace("Z", "+00:00"))
-    
-    # Convert to IST
-    ist = pytz.timezone('Asia/Kolkata')
-    live_start_time_ist = live_start_time.astimezone(ist)
-    
-    return live_start_time_ist.strftime('%H:%M')  # 24-hour format
+    try:
+        response = requests.get(url, params=params, timeout=10)  # Timeout after 10 seconds
+        response.raise_for_status()  # Raise HTTPError for bad responses
+        data = response.json()
+        
+        if not data["items"]:
+            return None  # Not live
+        
+        video_id = data["items"][0]["id"]["videoId"]
+        
+        url = f"https://www.googleapis.com/youtube/v3/videos"
+        params = {
+            "part": "liveStreamingDetails",
+            "id": video_id,
+            "key": api_key
+        }
+        
+        response = requests.get(url, params=params, timeout=10)  # Timeout after 10 seconds
+        response.raise_for_status()  # Raise HTTPError for bad responses
+        data = response.json()
+        
+        live_start_time = data["items"][0]["liveStreamingDetails"]["actualStartTime"]
+        live_start_time = datetime.fromisoformat(live_start_time.replace("Z", "+00:00"))
+        
+        # Convert to IST
+        ist = pytz.timezone('Asia/Kolkata')
+        live_start_time_ist = live_start_time.astimezone(ist)
+        
+        return live_start_time_ist.strftime('%H:%M')  # 24-hour format
+
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+        return None
 
 @app.route('/submit_answer')
 def show_submit_answer():
