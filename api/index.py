@@ -4,7 +4,7 @@ import time
 import pytz
 from datetime import datetime
 from threading import Thread
-from is_live import get_live_start_time
+import requests
 import os
 from dotenv import load_dotenv
 
@@ -65,6 +65,44 @@ def submit_prediction():
         print(f"{username}, {user_prediction}\n")
 
     return render_template('index.html', upcoming_event=f"{username}, your prediction has been submitted. Results will be revealed once jaiyash starts the stream. Thank you!")
+
+def get_live_start_time(api_key, channel_id):
+    url = "https://www.googleapis.com/youtube/v3/search"
+    params = {
+        "part": "snippet",
+        "channelId": channel_id,
+        "eventType": "live",
+        "type": "video",
+        "key": api_key
+    }
+    
+    response = requests.get(url, params=params)
+    data = response.json()
+    
+    if not data["items"]:
+        return None  # Not live
+    
+    video_id = data["items"][0]["id"]["videoId"]
+    
+    url = f"https://www.googleapis.com/youtube/v3/videos"
+    params = {
+        "part": "liveStreamingDetails",
+        "id": video_id,
+        "key": api_key
+    }
+    
+    response = requests.get(url, params=params)
+    data = response.json()
+    
+    live_start_time = data["items"][0]["liveStreamingDetails"]["actualStartTime"]
+    live_start_time = datetime.fromisoformat(live_start_time.replace("Z", "+00:00"))
+    
+    # Convert to IST
+    ist = pytz.timezone('Asia/Kolkata')
+    live_start_time_ist = live_start_time.astimezone(ist)
+    
+    return live_start_time_ist.strftime('%H:%M')  # 24-hour format
+
 
 @app.route('/submit_answer')
 def show_submit_answer():
