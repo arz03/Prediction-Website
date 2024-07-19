@@ -2,3 +2,4 @@ Flask==3.0.1
 Flask-OAuthlib==0.9.6
 requests
 pytz
+dotenv
