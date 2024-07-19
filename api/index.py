@@ -130,6 +130,8 @@ def calculate_points():
     global leaderboard
     global user_predictions
 
+    print("Calculating points...")
+
     if not correct_answer:
         while True:
             correct_answer = get_live_start_time(api_key, channel_id)
