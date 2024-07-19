@@ -1,105 +1,164 @@
-# app.py
 from flask import Flask, render_template, request, redirect, url_for
 import tempfile
-import os
+import time
+import pytz
 from datetime import datetime
+from threading import Thread
+from is_live import get_live_start_time
+import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 
-# Hardcoded password for setting the correct answer (replace with a secure method in production)
-password_for_answer = "arjun"
+# Load environment variables from .env file
+load_dotenv()
 
-# Set the upcoming event (e.g., what the streamer will wear)
+# API key and channel ID for YouTube API
+api_key = os.getenv("API_KEY")
+channel_id = os.getenv("CHANNEL_ID")
+
+# Password for submitting the answer
+password_for_answer = os.getenv("PASSWORD_FOR_ANSWER")
+
+# Upcoming event description
 upcoming_event = "Guess the time when jaiyash will start the stream."
 
-# Simple list to store predictions and points
+# List to store predictions
 predictions = []
+
+# Dictionary to store user predictions
 user_predictions = {}
+
+# Dictionary to store points for each user
 points = {}
+
+# Variable to store the correct answer
 correct_answer = ""
+
+# List to store the leaderboard
 leaderboard = []
 
-# Using tempfile to handle predictions and leaderboard files
+# Create temporary files to store predictions and leaderboard
 with tempfile.NamedTemporaryFile(mode='w+', delete=False) as predictions_file, tempfile.NamedTemporaryFile(mode='w+', delete=False) as leaderboard_file:
     predictions_file_path = predictions_file.name
     leaderboard_file_path = leaderboard_file.name
 
 @app.route('/')
 def home():
+    """
+    Renders the home page with the upcoming event description.
+    """
     return render_template('index.html', upcoming_event=upcoming_event)
 
 @app.route('/submit_prediction', methods=['POST'])
 def submit_prediction():
+    """
+    Handles the submission of user predictions.
+    """
     global predictions
     username = request.form.get('username')
     user_prediction = request.form.get('prediction')
     user_prediction = datetime.strptime(user_prediction, "%H:%M").strftime("%H:%M")
 
-    # Store user predictions in a file for later reference
     with open(predictions_file_path, "a") as file:
         file.write(f"{username}, {user_prediction}\n")
         print(f"{username}, {user_prediction}\n")
 
-    return render_template('index.html', upcoming_event=f"{username}, your prediction has been submitted. Results will be revealed once jaiyash starts the sream. Thank you!")
+    return render_template('index.html', upcoming_event=f"{username}, your prediction has been submitted. Results will be revealed once jaiyash starts the stream. Thank you!")
 
 @app.route('/submit_answer')
 def show_submit_answer():
+    """
+    Renders the page to submit the correct answer.
+    """
+    print(f"user predictions: {user_predictions}")
+    print(f"leaderboard: {leaderboard}")
     return render_template('submit_answer.html')
 
 @app.route('/submit_answer', methods=['POST'])
 def submit_answer():
+    """
+    Handles the submission of the correct answer and calculates points for each user.
+    """
     global correct_answer
     global leaderboard
     global user_predictions
 
-    # Check if correct_answer is not set, i.e., predictions are still being accepted
+    # Check if the correct answer is already set
     if not correct_answer:
-        entered_password = request.form.get('password')
+        while True:
+            correct_answer = get_live_start_time(api_key, channel_id)
+            if correct_answer:
+                break
+            else:
+                print("Jaiyaxh is not live yet. Checking again in 60 seconds...")
+                time.sleep(60)
 
-        if entered_password == password_for_answer:
-            correct_answer = request.form.get('correct_answer') # Convert to lowercase for case-insensitive matching
-            # Parse the correct_answer into a datetime object
-            # Assuming the date is not important, using a placeholder date
-            correct_time = datetime.strptime(correct_answer, "%H:%M")
+    correct_time = datetime.strptime(correct_answer, "%H:%M")
+    user_predictions = {}
+    with open(predictions_file_path, "r") as file:
+        for line in file:
+            username, user_prediction = line.strip().split(", ")
+            user_prediction_time = datetime.strptime(user_prediction, "%H:%M")
+            user_predictions[username] = user_prediction_time
 
-            # Read predictions from file and update leaderboard
-            user_predictions = {}
-            with open(predictions_file_path, "r") as file:
-                for line in file:
-                    username, user_prediction = line.strip().split(", ")
-                    user_prediction_time= datetime.strptime(user_prediction, "%H:%M")
-                    user_predictions[username] = user_prediction_time
+            time_difference_seconds = abs((user_prediction_time - correct_time).total_seconds())
+            time_difference = time_difference_seconds / 60
+            points[username] = time_difference
 
-                    time_difference_seconds = abs((user_prediction_time - correct_time).total_seconds())
-                    time_difference = time_difference_seconds / 60
-                    points[username] = time_difference
+    with open(leaderboard_file_path, "w") as file:
+        for username, score in sorted(points.items(), key=lambda x: x[1], reverse=True):
+            file.write(f"{username}, {score}, {user_predictions.get(username, 'N/A')}\n")
 
-                    #if user_prediction.lower() in correct_answer:
-                    #    points[username] = time_difference
+    leaderboard = sorted(points.items(), key=lambda x: x[1], reverse=False)
+    print(f"Final leaderboard list: {leaderboard}")
 
-            # Update leaderboard file
-            with open(leaderboard_file_path, "w") as file:
-                for username, score in sorted(points.items(), key=lambda x: x[1], reverse=True):
-                    file.write(f"{username}, {score}, {user_predictions.get(username, 'N/A')}\n")
-
-            # Update leaderboard variable
-            leaderboard = sorted(points.items(), key=lambda x: x[1], reverse=False)
-            print(f"leaderboard list: {leaderboard}")
-
-            return render_template('submit_answer.html', upcoming_event=upcoming_event, correct_answer_submitted=True, correct_answer_set=True, password_verified=True)
-
-        else:
-            return redirect(url_for('home'))
-
-    return redirect(url_for('home'))
+    return render_template('submit_answer.html', upcoming_event=upcoming_event, correct_answer_submitted=True, correct_answer_set=True, password_verified=True)
 
 @app.route('/reveal_answer')
 def reveal_answer():
+    """
+    Renders the page to reveal the correct answer and leaderboard.
+    """
     global correct_answer
     global leaderboard
     global user_predictions
     
     return render_template('revealed_answer.html', predictions=predictions, upcoming_event=upcoming_event, revealed_answer=correct_answer, correct_answer_set=True, password_verified=True, leaderboard=leaderboard, user_predictions=user_predictions)
 
+@app.route('/reset')
+def reset():
+    """
+    Resets the state of the application.
+    """
+    global correct_answer
+    global leaderboard
+    global predictions
+    global user_predictions
+    global points
+
+    correct_answer = ""
+    leaderboard = []
+    predictions = []
+    user_predictions = {}
+    points = {}
+
+    open(predictions_file_path, 'w').close()
+    open(leaderboard_file_path, 'w').close()
+
+    return redirect(url_for('home'))
+
+def automatic_reset():
+    """
+    Automatically resets the state of the application every 10 hours.
+    """
+    while True:
+        time.sleep(36000)  # 10 hours in seconds
+        with app.app_context():
+            reset()
+            print("State has been automatically reset.")
+
 if __name__ == '__main__':
+    reset_thread = Thread(target=automatic_reset, daemon=True)
+    reset_thread.start()
     app.run(debug=True)
