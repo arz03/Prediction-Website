@@ -38,6 +38,9 @@ correct_answer = ""
 # List to store the leaderboard
 leaderboard = []
 
+# Variable to store the stream start time
+stream_start_time = None
+
 # Create temporary files to store predictions and leaderboard
 with tempfile.NamedTemporaryFile(mode='w+', delete=False) as predictions_file, tempfile.NamedTemporaryFile(mode='w+', delete=False) as leaderboard_file:
     predictions_file_path = predictions_file.name
@@ -103,26 +106,30 @@ def get_live_start_time(api_key, channel_id):
     
     return live_start_time_ist.strftime('%H:%M')  # 24-hour format
 
-
 @app.route('/submit_answer')
 def show_submit_answer():
     """
     Renders the page to submit the correct answer.
     """
-    print(f"user predictions: {user_predictions}")
+    with open(predictions_file_path, "r") as file:
+        t_user_predictions = {}
+        for line in file:
+            username, user_prediction = line.strip().split(", ")
+            t_user_predictions[username] = user_prediction
+
+    print(f"user predictions: {t_user_predictions}")
     print(f"leaderboard: {leaderboard}")
     return render_template('submit_answer.html')
 
-@app.route('/submit_answer', methods=['POST'])
-def submit_answer():
+@app.route('/calculate_points')
+def calculate_points():
     """
-    Handles the submission of the correct answer and calculates points for each user.
+    Automatically calculates the points once the stream is live.
     """
     global correct_answer
     global leaderboard
     global user_predictions
 
-    # Check if the correct answer is already set
     if not correct_answer:
         while True:
             correct_answer = get_live_start_time(api_key, channel_id)
@@ -174,29 +181,41 @@ def reset():
     global predictions
     global user_predictions
     global points
+    global stream_start_time
 
     correct_answer = ""
     leaderboard = []
     predictions = []
     user_predictions = {}
     points = {}
+    stream_start_time = None
 
     open(predictions_file_path, 'w').close()
     open(leaderboard_file_path, 'w').close()
 
     return redirect(url_for('home'))
 
-def automatic_reset():
+def check_and_calculate_points():
     """
-    Automatically resets the state of the application every 10 hours.
+    Checks if the stream is live and calculates points if it is.
     """
+    global stream_start_time
     while True:
-        time.sleep(36000)  # 10 hours in seconds
-        with app.app_context():
-            reset()
-            print("State has been automatically reset.")
+        if get_live_start_time(api_key, channel_id):
+            if not stream_start_time:
+                stream_start_time = datetime.now(pytz.timezone('Asia/Kolkata'))
+                calculate_points()
+                reset_time = stream_start_time + timedelta(hours=10)
+                while datetime.now(pytz.timezone('Asia/Kolkata')) < reset_time:
+                    time.sleep(60)  # Sleep in intervals of 60 seconds
+                with app.app_context():
+                    reset()
+                    print("State has been automatically reset.")
+        time.sleep(60)  # Check every 60 seconds
 
 if __name__ == '__main__':
-    reset_thread = Thread(target=automatic_reset, daemon=True)
-    reset_thread.start()
+    # Start background threads
+    points_thread = Thread(target=check_and_calculate_points, daemon=True)
+    points_thread.start()
+    
     app.run(debug=True)
