@@ -316,5 +316,6 @@ def check_and_calculate_points():
 if __name__ == '__main__':
     # Start discord bot
     discord_bot_thread = Thread(target=client.run, args=(TOKEN,))
+    print("Starting discord bot...")
     discord_bot_thread.start()
     app.run(debug=False)
