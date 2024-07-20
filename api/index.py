@@ -317,4 +317,4 @@ if __name__ == '__main__':
     # Start discord bot
     discord_bot_thread = Thread(target=client.run, args=(TOKEN,))
     discord_bot_thread.start()
-    app.run(debug=True)
+    app.run(debug=False)
