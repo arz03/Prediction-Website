@@ -73,7 +73,7 @@ class DiscordBot(discord.Client):
 
 
 intents = discord.Intents.default()
-intents.message_content = True
+intents.messages = True
 client = DiscordBot(intents=intents)
 #client.run(TOKEN)
 
