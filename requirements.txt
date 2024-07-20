@@ -3,3 +3,4 @@ Flask-OAuthlib==0.9.6
 requests
 pytz
 python-dotenv==0.21.0
+discord.py==1.7.3
