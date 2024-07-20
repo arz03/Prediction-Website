@@ -7,7 +7,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # Hardcoded password for setting the correct answer (replace with a secure method in production)
-password_for_answer = "arjun"
+password_for_answer = os.getenv("PASSWORD_FOR_ANSWER")
 
 # Set the upcoming event (e.g., what the streamer will wear)
 upcoming_event = "Guess the time when jaiyash will start the stream."
