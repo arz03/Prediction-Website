@@ -44,6 +44,14 @@ def submit_prediction():
 
 @app.route('/submit_answer')
 def show_submit_answer():
+    with open(predictions_file_path, "r") as file:
+        t_user_predictions = {}
+        for line in file:
+            username, user_prediction = line.strip().split(", ")
+            t_user_predictions[username] = user_prediction
+
+    print(f"user predictions: {t_user_predictions}")
+    print(f"leaderboard: {leaderboard}")
     return render_template('submit_answer.html')
 
 @app.route('/submit_answer', methods=['POST'])
