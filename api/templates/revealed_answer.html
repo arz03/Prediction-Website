@@ -1,4 +1,3 @@
-<!-- templates/revealed_answer.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,7 +11,6 @@
 
     <style>
         body {
-            /*background: url('https://d15fp1m55rkn0.cloudfront.net/e6y4aa%2Fpreview%2F59266258%2Fmain_large.gif?response-content-disposition=inline%3Bfilename%3D"main_large.gif"%3B&response-content-type=image%2Fgif&Expires=1720878806&Signature=C8w81cOHwJpZuWRaRi9lIOyrT1FtRifpd~fds0N4RBlaTHJvs4ZZb4ouEKTLHQeFGn-o4xf2gO57fqOmvMOV9hKt344Ozf1AkDW~JyCMzhhlaarxsIQ5iF4dpr4Yv2ZaIsDA2ebjK2p3NxwRWWVTIXQWHbLQ1KNlg7BFCymj8wZpwfrbmL4ncznjbDQWJf~5vS-FJDX2jK2vxoUJJ7douKNZiGplffe9EgGz19Fdgx3EeUKZSL57mwBNemxPB~4YmwFEWKo-oO2z-sqP2CnoUuTOlPWkM5OEgVWsyOVstwx1fUlUvEGIb0o3dNE4BB~dHD4Vq-kGtqrQoQ1D~UlGmQ__&Key-Pair-Id=APKAJT5WQLLEOADKLHBQ') fixed center;*/
             background: repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(110, 6, 228, 0.5) 20px, rgba(128, 0, 128, 0.5) 40px), url('https://github.com/arz03/Prediction-Website/blob/main/api/templates/jaiyaxh-bhosdiwala.gif?raw=true') fixed center;
             background-size: cover;
             background-color: #673ab7; /* Purple Background */
@@ -78,6 +76,20 @@
             margin-top: 20px;
             color: white;
         }
+
+        .leaderboard-history-container {
+            margin-top: 20px;
+        }
+
+        .leaderboard-history-header {
+            font-size: 1.5rem;
+        }
+
+        .leaderboard-history-select {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
     </style>
 </head>
 
@@ -88,7 +100,6 @@
         </div>
     </nav>
 
-
     <div class="container leaderboard-container">
         {% if revealed_answer %}
             <h5 align="left">Correct Answer (Revealed)</h5>
@@ -96,6 +107,7 @@
         {% else %}
             <p >Answers will be revealed once jaiyaxh is live.</p>
         {% endif %}
+
         {% if leaderboard %}
             <hr>
             <h2>Leaderboard</h2>
@@ -116,13 +128,57 @@
         {% else %}  
             <p>No leaderboard available yet.</p>
         {% endif %}
+
+        <div class="leaderboard-history-container">
+            <h3 class="leaderboard-history-header">Leaderboard History</h3>
+            <div class="input-field col s12 leaderboard-history-select">
+                <select id="leaderboard-history" class="browser-default">
+                    <option value="" disabled selected>Select a date</option>
+                    {% for date in leaderboard_dates %}
+                        <option value="{{ date }}">{{ date }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="historical-leaderboard" class="historical-leaderboard">
+                <!-- Historical leaderboard data will be displayed here -->
+            </div>
+        </div>
     </div>
 
     <!-- Include Materialize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('select');
+            var instances = M.FormSelect.init(elems);
+        });
+
+        document.getElementById('leaderboard-history').addEventListener('change', function() {
+            var selectedDate = this.value;
+            var historicalDataContainer = document.getElementById('historical-leaderboard');
+            var leaderboardHistory = {{ leaderboard_history | tojson }};
+            var userPredictions = {{ user_predictions | tojson }};
+
+            var historicalData = leaderboardHistory[selectedDate];
+            historicalDataContainer.innerHTML = '';
+
+            if (historicalData) {
+                var content = '<hr><h2>Leaderboard for ' + selectedDate + '</h2>';
+                content += '<div class="leaderboard-row"><div class="leaderboard-name">Username</div><div class="leaderboard-score">Accuracy</div><div class="leaderboard-prediction">Prediction</div></div><hr>';
+
+                historicalData.forEach(function(entry) {
+                    content += '<div class="leaderboard-row"><div class="leaderboard-name">' + entry[0] + '</div><div class="leaderboard-score">± ' + entry[1] + ' minutes</div><div class="leaderboard-prediction">' + userPredictions[entry[0]] + '</div></div><hr>';
+                });
+
+                historicalDataContainer.innerHTML = content;
+            }
+        });
+    </script>
 </body>
 
 </html>
+
 <footer>
     <p>Made by Arjun</p>
     <a href="https://www.instagram.com/arjun__03._/">Find me on Instagram</a>
