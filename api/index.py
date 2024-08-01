@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 import tempfile, os, re
 from datetime import datetime
+import json
 
 app = Flask(__name__)
 
@@ -16,11 +17,14 @@ user_predictions = {}
 points = {}
 correct_answer = ""
 leaderboard = []
+leaderboard_history = {}
 
-# Temporary file paths for storing predictions and leaderboard
-with tempfile.NamedTemporaryFile(mode='w+', delete=False) as predictions_file, tempfile.NamedTemporaryFile(mode='w+', delete=False) as leaderboard_file:
+# Temporary file paths for storing predictions
+with tempfile.NamedTemporaryFile(mode='w+', delete=False) as predictions_file:
     predictions_file_path = predictions_file.name
-    leaderboard_file_path = leaderboard_file.name
+
+# Directory for storing leaderboards
+leaderboards_dir = tempfile.mkdtemp()
 
 @app.route('/')
 def home():
@@ -70,6 +74,7 @@ def submit_answer():
     global correct_answer
     global leaderboard
     global user_predictions
+    global leaderboard_history
 
     if not correct_answer:
         entered_password = request.form.get('password')
@@ -99,12 +104,17 @@ def submit_answer():
                             print(f"Skipping malformed line: {line.strip()}")
                             continue
 
-                with open(leaderboard_file_path, "w") as file:
-                    for username, score in sorted(points.items(), key=lambda x: x[1], reverse=True):
-                        file.write(f"{username}, {score}, {user_predictions.get(username, 'N/A')}\n")
+                # Save leaderboard to a timestamped file
+                leaderboard_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                leaderboard_filename = f"leaderboard_{leaderboard_timestamp}.json"
+                leaderboard_filepath = os.path.join(leaderboards_dir, leaderboard_filename)
 
+                with open(leaderboard_filepath, "w") as file:
+                    json.dump(points, file)
+
+                # Update leaderboard variable and history
                 leaderboard = sorted(points.items(), key=lambda x: x[1], reverse=False)
-                print(f"Leaderboard list: {leaderboard}")
+                leaderboard_history[leaderboard_timestamp] = leaderboard
 
                 return render_template('submit_answer.html', upcoming_event=upcoming_event, correct_answer_submitted=True, correct_answer_set=True, password_verified=True)
 
@@ -122,8 +132,13 @@ def reveal_answer():
     global correct_answer
     global leaderboard
     global user_predictions
-    
-    return render_template('revealed_answer.html', predictions=predictions, upcoming_event=upcoming_event, revealed_answer=correct_answer, correct_answer_set=True, password_verified=True, leaderboard=leaderboard, user_predictions=user_predictions)
+    global leaderboard_history
+
+    # Load leaderboard history
+    leaderboard_files = [f for f in os.listdir(leaderboards_dir) if f.startswith("leaderboard_")]
+    leaderboard_dates = [f.split("_")[1].split(".")[0] for f in leaderboard_files]
+
+    return render_template('revealed_answer.html', predictions=predictions, upcoming_event=upcoming_event, revealed_answer=correct_answer, correct_answer_set=True, password_verified=True, leaderboard=leaderboard, user_predictions=user_predictions, leaderboard_history=leaderboard_history, leaderboard_dates=leaderboard_dates)
 
 if __name__ == '__main__':
     app.run(debug=True)
